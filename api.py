@@ -12,14 +12,13 @@ from role_manager import RoleManager
 
 roles = []
 
-class RoleAPI(Resource):
 
+class RoleAPI(Resource):
     def get(self, role_id):
         return roles[role_id]
 
 
 class RolesAPI(Resource):
-
     def get(self):
         return roles
 
@@ -30,7 +29,7 @@ class RolesAPI(Resource):
             "id": role_id,
             "end_time": json_data["EndTime"],
             "requester": json_data["Requester"],
-            "permission_document": json.dumps(json_data["PermissionDocument"])
+            "permission_document": json.dumps(json_data["PermissionDocument"]),
         }
         thread = Thread(
             target=manage_role,
@@ -38,8 +37,8 @@ class RolesAPI(Resource):
                 role["id"],
                 role["end_time"],
                 role["requester"],
-                role["permission_document"]
-            ]
+                role["permission_document"],
+            ],
         )
         thread.daemon = True
         thread.start()
@@ -58,4 +57,3 @@ def manage_role(role_id, end_time, requester, permission_doc):
     wait_time = end_time - datetime.utcnow()
     time.sleep(wait_time.total_seconds())
     r.delete_role()
-

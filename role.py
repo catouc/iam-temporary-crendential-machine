@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import boto3
 
 
@@ -7,8 +5,8 @@ SESSION = boto3.Session()
 IAM = SESSION.resource("iam")
 CLIENT = SESSION.client("iam")
 
-class Role:
 
+class Role:
     def __init__(self, role_id, requester, end_time):
         self.id = role_id
         self.requester = requester
@@ -21,19 +19,10 @@ class Role:
             AssumeRolePolicyDocument=generate_assume_role_doc(self.requester),
             Description=f"Requested by {self.requester}",
             Tags=[
-                {
-                    "Key": "Name",
-                    "Value": self.id
-                },
-                {
-                    "Key": "Requester",
-                    "Value": self.requester
-                },
-                {
-                    "Key": "EndTime",
-                    "Value": self.end_time
-                }
-            ]
+                {"Key": "Name", "Value": self.id},
+                {"Key": "Requester", "Value": self.requester},
+                {"Key": "EndTime", "Value": self.end_time},
+            ],
         )
         return resp
 
@@ -47,11 +36,12 @@ class Role:
         role = IAM.Role(self.id)
         resp = role.attach_policy(PolicyArn=policy_arn)
         return resp
-    
+
     def detach_role_policy(self, policy_arn):
         role = IAM.Role(self.id)
         resp = role.detach_policy(PolicyArn=policy_arn)
         return resp
+
 
 def generate_assume_role_doc(requester):
     pol = """{

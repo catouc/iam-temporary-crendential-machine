@@ -6,7 +6,6 @@ CLIENT = SESSION.client("iam")
 
 
 class Policy:
-
     def __init__(self, pol_id, permission_document, requester):
         self.id = pol_id
         self.permission_document = permission_document
@@ -18,7 +17,7 @@ class Policy:
         resp = CLIENT.create_policy(
             PolicyName=self.id,
             PolicyDocument=self.permission_document,
-            Description=f"Requested by {self.requester}"
+            Description=f"Requested by {self.requester}",
         )
         return resp
 
