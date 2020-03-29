@@ -23,5 +23,7 @@ class Policy:
 
     def delete(self):
         policy = IAM.Policy(self.arn)
+        for role in policy.attached_roles.all():
+            policy.detach_role(RoleName=role.name)
         resp = policy.delete()
         return resp

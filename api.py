@@ -29,6 +29,7 @@ class RolesAPI(Resource):
             "id": role_id,
             "end_time": json_data["EndTime"],
             "requester": json_data["Requester"],
+            "principal": json_data["Principal"],
             "permission_document": json.dumps(json_data["PermissionDocument"]),
         }
         thread = Thread(
@@ -37,6 +38,7 @@ class RolesAPI(Resource):
                 role["id"],
                 role["end_time"],
                 role["requester"],
+                role["principal"],
                 role["permission_document"],
             ],
         )
@@ -50,8 +52,8 @@ def generate_acccess_id():
     return str(uuid.uuid4())
 
 
-def manage_role(role_id, end_time, requester, permission_doc):
-    r = RoleManager(role_id, requester, permission_doc, end_time)
+def manage_role(role_id, end_time, requester, principal, permission_doc):
+    r = RoleManager(role_id, requester, principal, permission_doc, end_time)
     date_format = "%Y-%m-%dT%H:%M:%S"
     end_time = datetime.strptime(end_time, date_format)
     wait_time = end_time - datetime.utcnow()

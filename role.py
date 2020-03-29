@@ -7,16 +7,17 @@ CLIENT = SESSION.client("iam")
 
 
 class Role:
-    def __init__(self, role_id, requester, end_time):
+    def __init__(self, role_id, requester, principal, end_time):
         self.id = role_id
         self.requester = requester
+        self.principal = principal
         self.end_time = end_time
         self.create()
 
     def create(self):
         resp = CLIENT.create_role(
             RoleName=self.id,
-            AssumeRolePolicyDocument=generate_assume_role_doc(self.requester),
+            AssumeRolePolicyDocument=generate_assume_role_doc(self.principal),
             Description=f"Requested by {self.requester}",
             Tags=[
                 {"Key": "Name", "Value": self.id},
@@ -27,8 +28,9 @@ class Role:
         return resp
 
     def delete(self):
-        # This won't handle the detaching of policies at the moment
         role = IAM.Role(self.id)
+        for pol in role.attached_policies.all():
+            pol.detach_role(RoleName=role.name)
         resp = role.delete()
         return resp
 
@@ -37,24 +39,22 @@ class Role:
         resp = role.attach_policy(PolicyArn=policy_arn)
         return resp
 
-    def detach_role_policy(self, policy_arn):
-        role = IAM.Role(self.id)
-        resp = role.detach_policy(PolicyArn=policy_arn)
-        return resp
 
-
-def generate_assume_role_doc(requester):
+def generate_assume_role_doc(principal):
     pol = """{
        "Version": "2012-10-17",
        "Statement": [
         {
             "Effect": "Allow",
             "Principal": {
-                "Service": "lambda.amazonaws.com"
+                "%s": "%s"
             },
             "Action": "sts:AssumeRole"
         }
        ]
     }
-    """
+    """ % (
+        principal["Type"],
+        principal["Name"],
+    )
     return pol
