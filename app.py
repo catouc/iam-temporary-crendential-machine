@@ -10,4 +10,4 @@ api.add_resource(RoleAPI, "/role/<role_id>")
 api.add_resource(RolesAPI, "/roles")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
